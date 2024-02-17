@@ -1,14 +1,18 @@
-/**
-  |============================
-  | include css partials with
-  | default @import url()
-  |============================
-*/
 @import url('./reset.css');
-@import url('./vite-promo.css');
-@import url('./header.css');
+@import url('./form.css');
+@import url('./gallery.css');
 
 :root {
+  --primary-light-color: #ffd5dc;
+  --primary-dark-color: #2b777e;
+  --accent-hover-color: #ff86aa;
+  --accent-active-color: #df2e2e;
+
+  --obj-shadow: 0.3px 0.3px 0.4px 0px #00000018,
+    1.3px 1.3px 0.75px 0px #1b1b1b13, 2.7px 3px 1.5px 0px #11111115,
+    5px 5px 4px 1px #1f272917, 6px 7px 4px 0px #1d232515,
+    9px 10px 6px 0px #1c1d1d1c, 12px 12px 6px 0px #2428290a;
+
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 24px;
@@ -22,4 +26,24 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+}
+
+.is-hidden {
+  position: absolute;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 0;
+  border: 0;
+  height: 1px;
+  width: 1px;
+  pointer-events: none;
+}
+
+.container {
+  width: 100%;
+  padding: 160px 40px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
