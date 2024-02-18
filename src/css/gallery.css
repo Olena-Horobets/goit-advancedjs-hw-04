@@ -4,6 +4,12 @@
   margin-top: 60px;
 }
 
+.loading-message {
+  color: #fff;
+  opacity: 0.7;
+  margin-top: 60px;
+}
+
 .gallery {
   padding: 0;
   display: flex;
@@ -11,6 +17,12 @@
   list-style: none;
   margin: 0;
   margin-bottom: 36px;
+}
+
+.gallery__link {
+  display: block;
+  text-decoration: none;
+  height: 100%;
 }
 
 .gallery-card {

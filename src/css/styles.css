@@ -2,6 +2,27 @@
 @import url('./form.css');
 @import url('./gallery.css');
 
+html {
+  box-sizing: border-box;
+  scrollbar-gutter: stable both-edges;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  background-color: var(--primary-light-color);
+  font-family: 'Source Sans Pro', sans-serif;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+}
+
 :root {
   --primary-light-color: #ffd5dc;
   --primary-dark-color: #2b777e;
@@ -46,4 +67,24 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #fff;
+  opacity: 0.5;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--primary-dark-color);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-active-color);
 }

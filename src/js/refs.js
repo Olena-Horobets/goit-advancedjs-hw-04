@@ -6,4 +6,5 @@ export default {
   loadMoreBtn: document.querySelector('[data-action="load-more"]'),
   gallery: document.querySelector('#gallery'),
   message: document.querySelector('.reqest-message'),
+  loading: document.querySelector('.loading-message'),
 };

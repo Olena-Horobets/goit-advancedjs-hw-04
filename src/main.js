@@ -1,4 +1,6 @@
+import axios from 'axios';
 import iziToast from 'izitoast';
+
 import 'izitoast/dist/css/iziToast.min.css';
 
 import refs from './js/refs.js';
@@ -13,7 +15,7 @@ refs.searchForm.addEventListener('input', e => {
 
 function onSearch(e) {
   e.preventDefault();
-  console.log('loading');
+  refs.loading.classList.remove('is-hidden');
 
   const value = e.currentTarget.elements.searchQuery.value.trim();
   if (value === '') {
@@ -33,7 +35,7 @@ function onSearch(e) {
 }
 
 function onServerResponse(cb, message) {
-  //   Loading.remove();
+  refs.loading.classList.add('is-hidden');
   iziToast[cb]({ message, position: 'topRight' });
 }
 
@@ -42,53 +44,41 @@ function onMarkupRender(list) {
 }
 
 async function fetchAndRender() {
-  console.log('loading');
+  refs.loading.classList.remove('is-hidden');
 
-  await fetch(photoFinder.getFetchUrl())
-    .then(res => res.json())
-    .then(data => {
-      if (data.totalHits === 0) {
-        onServerResponse(
-          'warning',
-          `Sorry, we couldn't find anything for you(`
-        );
-        onReset();
+  await axios(photoFinder.getFetchUrl()).then(({ data }) => {
+    if (data.totalHits === 0) {
+      onServerResponse('warning', `Sorry, we couldn't find anything for you(`);
+      onReset();
+      return;
+    }
+
+    if (data.hits.length < photoFinder.perPage) {
+      onServerResponse(
+        'info',
+        `This was all we had for you, try something else, please`
+      );
+      refs.loadMoreBtn.classList.add('is-hidden');
+      refs.loadMoreBtn.removeEventListener('click', fetchAndRender);
+      try {
+        onMarkupRender(galleryItemTpl(data.hits));
+        smoothScrollingTo(String(data.hits[0].id));
         return;
+      } catch (err) {
+        onServerResponse('error', 'Please, enter valid query!');
       }
-      if (data.hits.length < photoFinder.perPage) {
-        onServerResponse(
-          'info',
+    }
 
-          `This was all we had for you, try something else, please`
-        );
-        refs.loadMoreBtn.classList.add('is-hidden');
-        refs.loadMoreBtn.removeEventListener('click', fetchAndRender);
-        try {
-          onMarkupRender(galleryItemTpl(data.hits));
-          smoothScrollingTo(String(data.hits[0].id));
-          return;
-        } catch (err) {
-          onServerResponse('error', 'Please, enter valid query!');
-        }
-      }
+    if (photoFinder.page === 1) {
+      onServerResponse('success', `Hooray! We found ${data.totalHits} images.`);
+    }
 
-      if (photoFinder.page === 1) {
-        onServerResponse(
-          'success',
-          `Hooray! We found ${data.totalHits} images.`
-        );
-      }
-
-      onMarkupRender(galleryItemTpl(data.hits));
-      smoothScrollingTo(String(data.hits[0].id));
-      photoFinder.setNextPage();
-      console.log('loading remove');
-      refs.loadMoreBtn.classList.remove('is-hidden');
-      refs.loadMoreBtn.addEventListener('click', fetchAndRender);
-
-      //   modal.srcList = data.hits;
-      //   refs.gallery.addEventListener('click', modal.onModalOpen.bind(modal));
-    });
+    onMarkupRender(galleryItemTpl(data.hits));
+    smoothScrollingTo(String(data.hits[0].id));
+    photoFinder.setNextPage();
+    refs.loadMoreBtn.classList.remove('is-hidden');
+    refs.loadMoreBtn.addEventListener('click', fetchAndRender);
+  });
 }
 
 function onNewFetch(value = '') {
@@ -101,7 +91,7 @@ function onNewFetch(value = '') {
 }
 
 function onReset() {
-  refs.searchForm.elements.searchQuery.value = '';
+  refs.searchForm.reset();
   onNewFetch();
   refs.message.classList.remove('is-hidden');
   refs.resetBtn.disabled = true;
