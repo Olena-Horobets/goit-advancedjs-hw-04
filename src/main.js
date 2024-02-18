@@ -1,3 +1,6 @@
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
+
 import refs from './js/refs.js';
 import photoFinder from './js/fetchApi.js';
 import galleryItemTpl from './js/galleryMarkup.js';
@@ -14,7 +17,7 @@ function onSearch(e) {
 
   const value = e.currentTarget.elements.searchQuery.value.trim();
   if (value === '') {
-    onServerResponse('Please, enter valid query!');
+    onServerResponse('error', 'Please, enter valid query!');
     return;
   }
 
@@ -25,13 +28,13 @@ function onSearch(e) {
     onNewFetch(value);
     fetchAndRender();
   } catch (err) {
-    onServerResponse('Please, enter valid query!');
+    onServerResponse('error', 'Please, enter valid query!');
   }
 }
 
-function onServerResponse(message) {
+function onServerResponse(cb, message) {
   //   Loading.remove();
-  console.log(message);
+  iziToast[cb]({ message, position: 'topRight' });
 }
 
 function onMarkupRender(list) {
@@ -45,12 +48,17 @@ async function fetchAndRender() {
     .then(res => res.json())
     .then(data => {
       if (data.totalHits === 0) {
-        onServerResponse(`Sorry, we couldn't find anything for you(`);
+        onServerResponse(
+          'warning',
+          `Sorry, we couldn't find anything for you(`
+        );
         onReset();
         return;
       }
       if (data.hits.length < photoFinder.perPage) {
         onServerResponse(
+          'info',
+
           `This was all we had for you, try something else, please`
         );
         refs.loadMoreBtn.classList.add('is-hidden');
@@ -60,12 +68,15 @@ async function fetchAndRender() {
           smoothScrollingTo(String(data.hits[0].id));
           return;
         } catch (err) {
-          onServerResponse('Please, enter valid query!');
+          onServerResponse('error', 'Please, enter valid query!');
         }
       }
 
       if (photoFinder.page === 1) {
-        onServerResponse(`Hooray! We found ${data.totalHits} images.`);
+        onServerResponse(
+          'success',
+          `Hooray! We found ${data.totalHits} images.`
+        );
       }
 
       onMarkupRender(galleryItemTpl(data.hits));
@@ -90,7 +101,7 @@ function onNewFetch(value = '') {
 }
 
 function onReset() {
-  refs.searchForm.elements.query.value = '';
+  refs.searchForm.elements.searchQuery.value = '';
   onNewFetch();
   refs.message.classList.remove('is-hidden');
   refs.resetBtn.disabled = true;
